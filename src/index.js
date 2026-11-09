@@ -1,13 +1,12 @@
-import { fetchWithCache, FetchError } from "./fetcher.js";
-
-const CATALOGUE_PAGE_1 = "https://books.toscrape.com/catalogue/page-1.html";
-const CACHE_FILE = "catalogue-page-1.html";
+import { discoverBookUrls } from "./discover.js";
+import { FetchError } from "./fetcher.js";
 
 async function main() {
   try {
-    const { source, bytes } = await fetchWithCache(CATALOGUE_PAGE_1, CACHE_FILE);
-    // Print only a short summary, never the whole HTML.
-    console.log(`${source} ${CACHE_FILE} ${bytes} bytes`);
+    const { cataloguePages, discovered, books } = await discoverBookUrls();
+    console.log(
+      `catalogue_pages=${cataloguePages} discovered=${discovered} unique_urls=${books.length}`
+    );
   } catch (error) {
     if (error instanceof FetchError) {
       console.error(`FETCH FAILED ${error.url}: ${error.message}`);

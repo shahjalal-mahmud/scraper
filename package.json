@@ -11,7 +11,8 @@
     "start": "node src/index.js",
     "robots": "node src/check-robots.js",
     "check": "node src/check-output.js",
-    "start:broken": "node src/index.js --with-broken-url"
+    "start:broken": "node src/index.js --with-broken-url",
+    "embed-report": "node src/embed-report.js"
   },
   "dependencies": {
     "cheerio": "^1.2.0",

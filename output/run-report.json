@@ -1,7 +1,7 @@
 {
-  "started_at": "2026-11-09T14:28:44Z",
-  "finished_at": "2026-11-09T14:28:46Z",
-  "duration_ms": 1561,
+  "started_at": "2026-11-09T14:30:42Z",
+  "finished_at": "2026-11-09T14:30:43Z",
+  "duration_ms": 457,
   "catalogue_pages": 3,
   "discovered_urls": 60,
   "unique_urls": 60,
@@ -10,12 +10,6 @@
   "retries": 0,
   "valid_records": 60,
   "invalid_records": 0,
-  "failed_pages": 1,
-  "failures": [
-    {
-      "url": "https://books.toscrape.com/catalogue/this-book-does-not-exist_9999/index.html",
-      "status": 404,
-      "message": "Unexpected HTTP status 404"
-    }
-  ]
+  "failed_pages": 0,
+  "failures": []
 }

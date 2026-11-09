@@ -4,13 +4,21 @@ import { USER_AGENT, REQUEST_TIMEOUT_MS, MIN_DELAY_MS } from "./config.js";
 
 export const CACHE_DIR = path.resolve("cache");
 
+// Wait a moment before the single retry.
+const RETRY_DELAY_MS = 2000;
+
+// Counters for the run report.
+export const stats = { pagesFetched: 0, cacheHits: 0, retries: 0 };
+
 // Thrown for any fetch that did not end in a 200 page.
+// retryable is true only for timeouts/network errors and 5xx server errors.
 export class FetchError extends Error {
-  constructor(message, { url, status = null } = {}) {
+  constructor(message, { url, status = null, retryable = false } = {}) {
     super(message);
     this.name = "FetchError";
     this.url = url;
     this.status = status;
+    this.retryable = retryable;
   }
 }
 
@@ -46,8 +54,8 @@ async function writeCache(cacheFile, html) {
   await writeFile(fullPath, html, "utf8");
 }
 
-// One real request: identifying user-agent, timeout, status check.
-async function fetchFromSite(url) {
+// One real attempt: identifying user-agent, timeout, status check.
+async function attemptFetch(url) {
   await waitYourTurn();
 
   let response;
@@ -57,7 +65,8 @@ async function fetchFromSite(url) {
       signal: AbortSignal.timeout(REQUEST_TIMEOUT_MS),
     });
   } catch (error) {
-    throw new FetchError(`Request failed: ${error.message}`, { url });
+    // Timeout or network problem: worth one more try.
+    throw new FetchError(`Request failed: ${error.message}`, { url, retryable: true });
   }
 
   // Only 200 means "here is your page". Anything else is a failed fetch, not HTML to parse.
@@ -65,16 +74,34 @@ async function fetchFromSite(url) {
     throw new FetchError(`Unexpected HTTP status ${response.status}`, {
       url,
       status: response.status,
+      // 5xx: the server had a problem, try once more.
+      // 404 (does not exist) and 403 (the site said no) are never retried.
+      retryable: response.status >= 500,
     });
   }
 
   return await response.text();
 }
 
+// Retry exactly once, and only when retrying makes sense.
+async function fetchFromSite(url) {
+  try {
+    return await attemptFetch(url);
+  } catch (error) {
+    if (error instanceof FetchError && error.retryable) {
+      stats.retries += 1;
+      await sleep(RETRY_DELAY_MS);
+      return await attemptFetch(url);
+    }
+    throw error;
+  }
+}
+
 // Main entry point: read the saved copy if we have one, otherwise fetch and save it.
 export async function fetchWithCache(url, cacheFile) {
   const cached = await readCache(cacheFile);
   if (cached !== null) {
+    stats.cacheHits += 1;
     return {
       html: cached.html,
       source: "CACHE HIT",
@@ -85,6 +112,7 @@ export async function fetchWithCache(url, cacheFile) {
 
   const html = await fetchFromSite(url);
   await writeCache(cacheFile, html);
+  stats.pagesFetched += 1;
   return {
     html,
     source: "FETCH",

@@ -1,0 +1,21 @@
+{
+  "started_at": "2026-11-09T14:28:44Z",
+  "finished_at": "2026-11-09T14:28:46Z",
+  "duration_ms": 1561,
+  "catalogue_pages": 3,
+  "discovered_urls": 60,
+  "unique_urls": 60,
+  "pages_fetched": 0,
+  "cache_hits": 63,
+  "retries": 0,
+  "valid_records": 60,
+  "invalid_records": 0,
+  "failed_pages": 1,
+  "failures": [
+    {
+      "url": "https://books.toscrape.com/catalogue/this-book-does-not-exist_9999/index.html",
+      "status": 404,
+      "message": "Unexpected HTTP status 404"
+    }
+  ]
+}

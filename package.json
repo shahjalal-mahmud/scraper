@@ -1,0 +1,18 @@
+{
+  "name": "polite-scraper",
+  "version": "1.0.0",
+  "description": "FlyRank Internship A9 - a small, polite scraper for Books to Scrape",
+  "type": "module",
+  "private": true,
+  "engines": {
+    "node": ">=20"
+  },
+  "scripts": {
+    "start": "node src/index.js",
+    "robots": "node src/check-robots.js"
+  },
+  "dependencies": {
+    "cheerio": "^1.2.0",
+    "zod": "^4.6.7"
+  }
+}

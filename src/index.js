@@ -1,0 +1,1 @@
+console.log("Polite scraper: Stage 0 complete. Nothing is scraped yet.");
